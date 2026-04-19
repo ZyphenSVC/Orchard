@@ -2,17 +2,16 @@
 //     println!("Hello, world!");
 // }
 
+mod routes;
+mod config;
+
 use actix_cors::Cors;
-use actix_web::{web, get, App, HttpResponse, HttpServer, Responder};
+use actix_web::{web, get, App, HttpServer, Responder};
+use crate::routes::heartbeat::heartbeat;
 
 #[get("/")]
 async fn home() -> impl Responder {
     "Backend is running"
-}
-
-#[get("/heartbeat")]
-async fn heartbeat() -> impl Responder {
-    HttpResponse::Ok().json(serde_json::json!({ "status": "ok" }))
 }
 
 fn api_scope() -> actix_web::Scope {
