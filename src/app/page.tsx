@@ -1,4 +1,3 @@
-import Image from "next/image";
 import {getHeartbeat} from "@/api/api";
 export default async function Home() {
       const data = await getHeartbeat();
