@@ -1,27 +1,21 @@
-// fn main() {
-//     println!("Hello, world!");
-// }
-
 mod routes;
 mod config;
 
 use actix_cors::Cors;
 use actix_web::{web, get, App, HttpServer, Responder};
-use crate::routes::heartbeat::heartbeat;
+use crate::config::Config;
 
 #[get("/")]
 async fn home() -> impl Responder {
     "Backend is running"
 }
 
-fn api_scope() -> actix_web::Scope {
-    web::scope("/api")
-    .service(heartbeat)
-}
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    println!("Server running on http://localhost:3001");
+    dotenvy::dotenv().ok();
+    let config = Config::from_env();
+
+    println!("Server running on http://{}:{}", config.host, config.port);
 
     HttpServer::new(|| {
         let cors = Cors::default()
@@ -33,9 +27,10 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(cors)
             .service(home)
-            .service(api_scope())
+            .service(web::scope("/api"))
+            .configure(routes::heartbeat::init)
     })
-        .bind("127.0.0.1:3001")?
+        .bind(format!("{}:{}", config.host, config.port))?
         .run()
         .await
 }
