@@ -1,5 +1,7 @@
-mod routes;
-mod config;
+pub mod routes;
+pub mod config;
+pub mod services;
+pub mod models;
 
 use actix_cors::Cors;
 use actix_web::{web, get, App, HttpServer, Responder};
@@ -27,8 +29,12 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(cors)
             .service(home)
-            .service(web::scope("/api"))
-            .configure(routes::heartbeat::init)
+            .service(
+                web::scope("/api")
+                    .configure(routes::heartbeat::init)
+                    .configure(routes::music::init)
+            )
+
     })
         .bind(format!("{}:{}", config.host, config.port))?
         .run()
