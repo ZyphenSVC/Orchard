@@ -10,6 +10,9 @@ export default function Navbar() {
                 <Link href="/music" className="font-medium hover:underline">
                     Music
                 </Link>
+                <Link href="/search" className="font-medium hover:underline">
+                    Search
+                </Link>
             </div>
         </nav>
     )
