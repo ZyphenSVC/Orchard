@@ -10,3 +10,14 @@ export async function getHeartbeat() {
     if(!res.ok) throw new Error("Failed to fetch backend heartbeat");
     return res.json()
 }
+
+export async function getMusicTest(): Promise<MessageResponse> {
+    const res = await fetch(`${baseUrl}/api/music/test`, {
+        cache: "no-store",
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to fetch music test");
+    }
+    return res.json()
+}

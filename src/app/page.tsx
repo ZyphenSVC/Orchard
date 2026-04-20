@@ -1,10 +1,10 @@
-import {getHeartbeat} from "@/api/api";
+import {getHeartbeat, getMusicTest} from "@/api/api";
 export default async function Home() {
-      const data = await getHeartbeat();
+      const [health, music] = await Promise.all([getHeartbeat(), getMusicTest()])
       return (
           <main className="p-8">
-            <h1 className="text-2xl font-bold">Rust Music App</h1>
-            <p className="mt-4">Backend status: {data.status}</p>
+            <h1 className="text-2xl font-bold">Orchard Music</h1>
+                <p className="mt-4">Backend status: {health.status}</p>
           </main>
       )
 }
