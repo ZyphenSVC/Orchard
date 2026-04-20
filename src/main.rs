@@ -3,40 +3,44 @@ pub mod config;
 pub mod services;
 pub mod models;
 
-use actix_cors::Cors;
-use actix_web::{web, get, App, HttpServer, Responder};
-use crate::config::Config;
+use axum::routing::get;
+use axum::Router;
+use std::net::SocketAddr;
+use tower_http::cors::CorsLayer;
+use tower_http::trace::TraceLayer;
+use config::Config;
+use axum::http::HeaderValue;
 
-#[get("/")]
-async fn home() -> impl Responder {
+async fn home() -> &'static str {
     "Backend is running"
 }
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
+#[tokio::main]
+async fn main() {
     dotenvy::dotenv().ok();
     let config = Config::from_env();
 
     println!("Server running on http://{}:{}", config.host, config.port);
 
-    HttpServer::new(|| {
-        let cors = Cors::default()
-            .allow_any_origin()
-            .allow_any_origin()
-            .allow_any_header()
-            .allow_any_method();
+    let cors = CorsLayer::new()
+        .allow_origin(config.frontend_url.parse::<HeaderValue>().unwrap())
+        .allow_methods(tower_http::cors::Any)
+        .allow_headers(tower_http::cors::Any);
 
-        App::new()
-            .wrap(cors)
-            .service(home)
-            .service(
-                web::scope("/api")
-                    .configure(routes::heartbeat::init)
-                    .configure(routes::music::init)
-            )
+    let app = Router::new()
+        .route("/", get(home))
+        .route("/api/heartbeat", get(routes::heartbeat::heartbeat))
+        .route("/api/music/test", get(routes::music::music_test))
+        .route("/api/music/search", get(routes::music::search))
+        .layer(TraceLayer::new_for_http())
+        .layer(cors);
 
-    })
-        .bind(format!("{}:{}", config.host, config.port))?
-        .run()
+    let addr = SocketAddr::from((config.host.parse::<std::net::IpAddr>().unwrap(), config.port));
+    let listener = tokio::net::TcpListener::bind(addr)
         .await
+        .expect("Failed to bind TCP listener");
+
+    axum::serve(listener, app)
+        .await
+        .expect("Failed to start server");
 }

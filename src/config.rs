@@ -1,6 +1,8 @@
+#[derive(Clone)]
 pub struct Config {
     pub host: String,
     pub port: u16,
+    pub frontend_url: String,
 }
 
 impl Config {
@@ -11,10 +13,13 @@ impl Config {
             .ok()
             .and_then(|value| value.parse::<u16>().ok())
             .unwrap_or(3001);
+        let frontend_url = std::env::var("FRONTEND_URL")
+            .unwrap_or_else(|_| "http://localhost:3000".to_string());
 
         Self {
             host,
             port,
+            frontend_url,
         }
     }
 }

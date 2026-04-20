@@ -1,24 +1,23 @@
-use actix_web::{web, get, HttpResponse, Responder};
-use actix_web::web::Query;
+use axum::extract::Query;
+use axum::Json;
 use crate::models::api::{ MessageResponse, SearchResponse };
+use serde::Deserialize;
 
-#[get("/music/test")]
-async fn test() -> impl Responder {
-    HttpResponse::Ok().json(MessageResponse {
+#[derive(Deserialize)]
+pub struct SearchParams {
+    pub value: Option<String>,
+}
+
+pub async fn music_test() -> Json<MessageResponse> {
+    Json(MessageResponse {
         message: crate::services::music::test_message().to_string()
     })
 }
 
-#[get("/music/search")]
-async fn search(query: Query<std::collections::HashMap<String, String>>) -> impl Responder {
-    let value = query.get("value").cloned().unwrap_or_default();
-    HttpResponse::Ok().json(SearchResponse {
+pub async fn search(Query(query): Query<SearchParams>) -> Json<SearchResponse> {
+    let value = query.value.unwrap_or("".to_string());
+    Json(SearchResponse {
         message: crate::services::music::search_message().to_string(),
         value
     })
-}
-
-pub fn init(cfg: &mut web::ServiceConfig) {
-    cfg.service(test);
-    cfg.service(search);
 }
