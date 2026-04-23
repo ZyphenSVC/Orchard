@@ -1,36 +1,50 @@
-import type { HeartBeatResponse, MessageResponse, SearchResponse } from "@/types/api"
+import type {
+  HeartBeatResponse,
+  MessageResponse,
+  MusicSearchResponse,
+} from "@/types/api";
 
 const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-if (!baseUrl) throw new Error("NEXT_PUBLIC_BACKEND_URL not defined.");
+if (!baseUrl) {
+  throw new Error("NEXT_PUBLIC_BACKEND_URL not defined.");
+}
 
 export async function getHeartbeat(): Promise<HeartBeatResponse> {
-    const res = await fetch(`${baseUrl}/api/heartbeat`, {
-        cache: "no-store"
-    });
+  const res = await fetch(`${baseUrl}/api/heartbeat`, {
+    cache: "no-store",
+  });
 
-    if(!res.ok) throw new Error("Failed to fetch backend heartbeat");
-    return res.json()
+  if (!res.ok) {
+    throw new Error("Failed to fetch heartbeat.");
+  }
+
+  return res.json();
 }
 
 export async function getMusicTest(): Promise<MessageResponse> {
-    const res = await fetch(`${baseUrl}/api/music/test`, {
-        cache: "no-store",
-    });
+  const res = await fetch(`${baseUrl}/api/music/test`, {
+    cache: "no-store",
+  });
 
-    if (!res.ok) {
-        throw new Error("Failed to fetch music test");
-    }
-    return res.json()
+  if (!res.ok) {
+    throw new Error("Failed to fetch music test.");
+  }
+
+  return res.json();
 }
 
-export async function searchMusic(value: string): Promise<SearchResponse> {
-    const res = await fetch(`${baseUrl}/api/music/search?value=${encodeURIComponent(value)}`, {
-        cache: "no-store",
-    });
-
-    if (!res.ok) {
-        throw new Error("Failed to fetch music test");
+export async function searchMusic(value: string): Promise<MusicSearchResponse> {
+  const res = await fetch(
+    `${baseUrl}/api/music/search?value=${encodeURIComponent(value)}`,
+    {
+      cache: "no-store",
     }
-    return res.json()
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to search music.");
+  }
+
+  return res.json();
 }
