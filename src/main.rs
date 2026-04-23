@@ -2,6 +2,7 @@ pub mod routes;
 pub mod config;
 pub mod services;
 pub mod models;
+pub mod clients;
 
 use axum::routing::get;
 use axum::Router;
@@ -31,7 +32,7 @@ async fn main() {
         .route("/", get(home))
         .route("/api/heartbeat", get(routes::heartbeat::heartbeat))
         .route("/api/music/test", get(routes::music::music_test))
-        .route("/api/music/search", get(routes::music::search))
+        .route("/api/music/search", get(routes::music::music_search))
         .layer(TraceLayer::new_for_http())
         .layer(cors);
 
